@@ -13,7 +13,7 @@ function showModal() {
   websiteNameEl.focus();
 }
 
-modalShow.addEventListener("click", showModal());
+modalShow.addEventListener("click", showModal);
 modalClose.addEventListener("click", () =>
   modal.classList.remove("show-modal")
 );
@@ -38,6 +38,41 @@ function validate(nameValue, urlValue) {
   return true;
 }
 
+function buildBookmarks() {
+  bookmarksContainer.textContent = "";
+
+  bookmarks.forEach((bookmark) => {
+    const { name, url } = bookmark;
+
+    const item = document.createElement("div");
+    item.classList.add("item");
+
+    const closeIcon = document.createElement("i");
+    closeIcon.classList.add("fas", "fa-times");
+    closeIcon.setAttribute("title", "Delete Bookmark");
+    closeIcon.setAttribute("onclick", `deleteBookmark('${url}')`);
+
+    const linkInfo = document.createElement("div");
+    linkInfo.classList.add("name");
+
+    const favicon = document.createElement("img");
+    favicon.setAttribute(
+      "src",
+      `https://s2.googleusercontent.com/s2/favicons?domain=${url}`
+    );
+    favicon.setAttribute("alt", "Favicon");
+
+    const link = document.createElement("a");
+    link.setAttribute("href", `${url}`);
+    link.setAttribute("target", "_blank");
+    link.textContent = name;
+
+    linkInfo.append(favicon, link);
+    item.append(closeIcon, linkInfo);
+    bookmarksContainer.appendChild(item);
+  });
+}
+
 function fetchBookmarks() {
   if (localStorage.getItem("bookmarks")) {
     bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
@@ -45,7 +80,17 @@ function fetchBookmarks() {
     bookmarks = [{ name: "YouTube", url: "https://www.youtube.com/" }];
     localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
   }
-  console.log(bookmarks);
+  buildBookmarks();
+}
+
+function deleteBookmark(url) {
+  bookmarks.forEach((bookmark, i) => {
+    if (bookmark.url === url) {
+      bookmarks.splice(i, 1);
+    }
+  });
+  localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+  fetchBookmarks();
 }
 
 function storeBookmark(e) {
